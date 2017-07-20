@@ -21,6 +21,7 @@ class ViewController: UIViewController, UITableViewDelegate, CLLocationManagerDe
     
     var updateSpan: Bool = true
     var pinDropCount = 0
+    var rowClicked: Int = 0
     
     let manager = CLLocationManager()
     
@@ -57,16 +58,6 @@ class ViewController: UIViewController, UITableViewDelegate, CLLocationManagerDe
                     for quake in quakeArray {
                         self.earthquakes.append(quake as! NSDictionary)
                     }
-                    /*if let results = jsonResult["results"] as? NSArray {
-                        print("inside results = jsonResult")
-                        for earthquake in results {
-                            print("inside earthquake")
-                            let earthquakeDict = earthquake as! NSDictionary
-                            self.earthquakes.append(earthquakeDict)
-                            //print(earthquakeDict)
-                            // self.people.append(personDict["name"]! as! String)
-                        }
-                    }*/
                 }
                 DispatchQueue.main.async {
                     //print(self.earthquakes)
@@ -107,8 +98,11 @@ class ViewController: UIViewController, UITableViewDelegate, CLLocationManagerDe
     //take the data from the rowin and display it in the next page. 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Section: \(indexPath.section) and Row: \(indexPath.row)")
+        self.rowClicked = indexPath.row
+        print(self.rowClicked)
         performSegue(withIdentifier: "SpecificQuakeSegue", sender: indexPath)
-        print(indexPath.row)
+        //print(indexPath.row)
+        //print(earthquakes[indexPath.row]
         //tableView.reloadData()
     }
     
@@ -121,16 +115,33 @@ class ViewController: UIViewController, UITableViewDelegate, CLLocationManagerDe
         //let indexPath = sender as! NSIndexPath
         //print(indexPath.row)
         //let item = items[indexPath.row]
-        specificVC.location = "Cali"
-        specificVC.coordinates = "-115,37"
-        specificVC.magnitude = "1.8"
-        specificVC.link = "http://linkgoeshere"
+        let message = earthquakes[self.rowClicked]["msg"] as! NSDictionary
+        let properties = message["properties"] as! NSDictionary
+        let title = properties["place"]
+        let url = properties["url"]
+        let magnitude = properties["mag"] as! Double
+        let magNumber = magnitude as NSNumber
+        let magString: String = magNumber.stringValue
+        let geometry = message["geometry"] as! NSDictionary
+        let coordinates = geometry["coordinates"] as! NSArray
+        let longitude = coordinates[0] as! Double
+        let lattitude = coordinates[1] as! Double
+        let longString: String = String(format:"%f",longitude)
+        let latString: String = String(format:"%f",lattitude)
+        let coordinateString = latString + " , " + longString
+        specificVC.lattitude = lattitude
+        specificVC.longitude = longitude
+        specificVC.location = title as? String
+        specificVC.coordinates = coordinateString
+        specificVC.magnitude = magString
+        specificVC.link = url as! String
     }
     
     
     
     @IBAction func unwindToMainView(segue: UIStoryboardSegue) {
         print("unwound to main view controller!")
+        //self.rowClicked = 0
     }
     
     

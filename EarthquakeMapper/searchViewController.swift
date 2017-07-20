@@ -8,10 +8,15 @@
 
 import UIKit
 
-class searchViewController: UIViewController {
+class searchViewController: UIViewController, UITextFieldDelegate {
 
+    @IBOutlet weak var magInput: UITextField!
+    @IBOutlet weak var regionInput: UITextField!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.magInput.delegate = self
 
         // Do any additional setup after loading the view.
     }
@@ -20,5 +25,13 @@ class searchViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
 
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        magInput.resignFirstResponder()
+        return (true)
+    }
 }
